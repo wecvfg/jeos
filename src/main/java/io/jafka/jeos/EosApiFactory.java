@@ -11,10 +11,10 @@ public abstract class EosApiFactory {
      * @return api client
      * @see https://www.eosdocs.io/resources/apiendpoints/
      */
+
     public static EosApi create(String baseUrl) {
         return new EosApiRestClientImpl(baseUrl);
     }
-
     public static EosApi create(String walletBaseUrl, String chainBaseUrl, String historyBaseUrl) {
         return new EosApiRestClientImpl(walletBaseUrl, chainBaseUrl, historyBaseUrl);
     }

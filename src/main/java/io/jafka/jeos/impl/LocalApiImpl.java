@@ -37,22 +37,23 @@ public class LocalApiImpl implements LocalApi {
         // ① pack transfer data
         TransferArg transferArg = new TransferArg(from, to, quantity, memo);
         String transferData = Packer.packTransfer(transferArg);
-        //
-
         // ③ create the authorization
         List<TransactionAuthorization> authorizations = Arrays.asList(new TransactionAuthorization(from, "active"));
 
         // ④ build the all actions
-        List<TransactionAction> actions = Arrays.asList(//
-                new TransactionAction(account, "transfer", authorizations, transferData)//
+        List<TransactionAction> actions = Arrays.asList(
+                new TransactionAction(account, "transfer", authorizations, transferData)
         );
+        return buildPackedTransaction(arg, privateKey, actions);
+    }
 
+    public PushTransactionRequest buildPackedTransaction(SignArg arg, String privateKey, List<TransactionAction> actions) {
         // ⑤ build the packed transaction
         PackedTransaction packedTransaction = new PackedTransaction();
         packedTransaction.setExpiration(arg.getHeadBlockTime().plusSeconds(arg.getExpiredSecond()));
         packedTransaction.setRefBlockNum(arg.getLastIrreversibleBlockNum());
         packedTransaction.setRefBlockPrefix(arg.getRefBlockPrefix());
-        
+
         packedTransaction.setMaxNetUsageWords(0);
         packedTransaction.setMaxCpuUsageMs(0);
         packedTransaction.setDelaySec(0);
@@ -69,7 +70,6 @@ public class LocalApiImpl implements LocalApi {
 
         Raw raw = Packer.packPackedTransaction(arg.getChainId(), t);
         raw.pack(ByteBuffer.allocate(33).array());// TODO: what's this?
-        String hash = KeyUtil.signHash(privateKey, raw.bytes());
-        return hash;
+        return KeyUtil.signHash(privateKey, raw.bytes());
     }
 }
